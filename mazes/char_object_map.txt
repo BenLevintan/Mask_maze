@@ -1,14 +1,21 @@
 wr  - red wall
+wg  - green wall
+wb  - blue wall
 w   - wall
 dk1 - door connected with key 1
 dp1 - door connected with press 1
 pr  - press
 er  - enemy red
+eg  - enemy green
+eb  - enemy blue
 ee  - enemy without color
 k1  - key for door 1
 mr  - mask red
+mg  - mask red
+mb  - mask red
 dec - deceration
 p   - player
 tau - trap arrows up (u,d,r,l - up,down,right,left) 
 tgu - trap gilutin up (u,d,r,l - up,down,right,left) 
 br  - box red
+end - the level endpoint

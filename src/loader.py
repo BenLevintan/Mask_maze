@@ -91,6 +91,14 @@ class Decoration(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
 
 
+class Endpoint(pygame.sprite.Sprite):
+    """Level endpoint - player reaches here to complete level."""
+    def __init__(self, x, y, sprite_img):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+
 def load_placeholder_image(width, height, color):
     """Create a placeholder surface with a specific color."""
     surf = pygame.Surface((width, height))
@@ -125,9 +133,9 @@ def create_asset_dict(tile_size):
     """Create a dictionary of images for all assets."""
     colors = {
         'red': (200, 50, 50),
-        'neutral': (100, 100, 100),
-        'blue': (50, 50, 200),
         'green': (50, 200, 50),
+        'blue': (50, 50, 200),
+        'neutral': (100, 100, 100),
         'yellow': (200, 200, 50),
         'purple': (200, 50, 200),
         'cyan': (50, 200, 200),
@@ -136,20 +144,26 @@ def create_asset_dict(tile_size):
     }
     
     assets = {}
-    # Walls - use your textures
+    # Walls
     assets['wr'] = load_texture('red_wall.bmp', tile_size, tile_size, colors['red'])
+    assets['wg'] = load_texture('green_wall.bmp', tile_size, tile_size, colors['green'])
+    assets['wb'] = load_texture('blue_wall.bmp', tile_size, tile_size, colors['blue'])
     assets['w'] = load_texture('white_wall.bmp', tile_size, tile_size, colors['white'])
     
     # Player (smaller - 24x24)
     player_size = 24
     assets['p'] = load_texture('player.bmp', player_size, player_size, colors['blue'])
     
-    # Enemies
-    assets['er'] = load_texture('red_enemy.bmp', tile_size, tile_size, colors['red'])
+    # Enemies - use your mask textures as enemy sprites
+    assets['er'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
+    assets['eg'] = load_texture('green_turtle_mask_32.bmp', tile_size, tile_size, colors['green'])
+    assets['eb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
     assets['ee'] = load_texture('yellow_enemy.bmp', tile_size, tile_size, colors['yellow'])
     
     # Masks - use your mask textures
-    assets['mr'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, (50, 200, 200))
+    assets['mr'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
+    assets['mg'] = load_texture('green_turtle_mask_32.bmp', tile_size, tile_size, colors['green'])
+    assets['mb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
     
     # Boxes
     assets['br'] = load_texture('red_box.bmp', tile_size, tile_size, (180, 50, 50))
@@ -166,6 +180,9 @@ def create_asset_dict(tile_size):
     
     # Decoration
     assets['dec'] = load_texture('decoration.bmp', tile_size, tile_size, (150, 150, 150))
+    
+    # Endpoint (flag)
+    assets['end'] = load_texture('level_end.bmp', tile_size, tile_size, colors['green'])
     
     return assets
 
@@ -189,6 +206,7 @@ def load_level(csv_path, tile_size=32):
     boxes = pygame.sprite.Group()
     traps = pygame.sprite.Group()
     decorations = pygame.sprite.Group()
+    endpoints = pygame.sprite.Group()
     
     # Create asset placeholders
     assets = create_asset_dict(tile_size)
@@ -227,7 +245,23 @@ def load_level(csv_path, tile_size=32):
                     # Red wall
                     elif cell == 'wr':
                         wall = Wall(x, y, assets['wr'], tile_size, color='red')
-                        wall.color = 'red'  # Add color attribute for mask logic
+                        wall.color = 'red'
+                        all_sprites.add(wall)
+                        solid_sprites.add(wall)
+                        mask_sprites.add(wall)
+                    
+                    # Green wall
+                    elif cell == 'wg':
+                        wall = Wall(x, y, assets['wg'], tile_size, color='green')
+                        wall.color = 'green'
+                        all_sprites.add(wall)
+                        solid_sprites.add(wall)
+                        mask_sprites.add(wall)
+                    
+                    # Blue wall
+                    elif cell == 'wb':
+                        wall = Wall(x, y, assets['wb'], tile_size, color='blue')
+                        wall.color = 'blue'
                         all_sprites.add(wall)
                         solid_sprites.add(wall)
                         mask_sprites.add(wall)
@@ -237,9 +271,36 @@ def load_level(csv_path, tile_size=32):
                         mask_obj = Mask(x, y, assets['mr'], 'red')
                         all_sprites.add(mask_obj)
                     
+                    # Green mask
+                    elif cell == 'mg':
+                        mask_obj = Mask(x, y, assets['mg'], 'green')
+                        all_sprites.add(mask_obj)
+                    
+                    # Blue mask
+                    elif cell == 'mb':
+                        mask_obj = Mask(x, y, assets['mb'], 'blue')
+                        all_sprites.add(mask_obj)
+                    
                     # Red enemy
                     elif cell == 'er':
                         enemy = Enemy(x, y, assets['er'], 'red', lives=1)
+                        all_sprites.add(enemy)
+                        enemies.add(enemy)
+                        mask_sprites.add(enemy)
+                    
+                    # Green enemy
+                    elif cell == 'eg':
+                        enemy = Enemy(x, y, assets['eg'], 'green', lives=1)
+                        all_sprites.add(enemy)
+                        enemies.add(enemy)
+                        mask_sprites.add(enemy)
+                    
+                    # Blue enemy
+                    elif cell == 'eb':
+                        enemy = Enemy(x, y, assets['eb'], 'blue', lives=1)
+                        all_sprites.add(enemy)
+                        enemies.add(enemy)
+                        mask_sprites.add(enemy)
                         all_sprites.add(enemy)
                         enemies.add(enemy)
                         mask_sprites.add(enemy)
@@ -303,6 +364,12 @@ def load_level(csv_path, tile_size=32):
                         deco = Decoration(x, y, assets['dec'])
                         all_sprites.add(deco)
                     
+                    # Endpoint
+                    elif cell == 'end':
+                        endpoint = Endpoint(x, y, assets['end'])
+                        all_sprites.add(endpoint)
+                        endpoints.add(endpoint)
+                    
                     x_counter += 1
     
     except FileNotFoundError:
@@ -320,4 +387,5 @@ def load_level(csv_path, tile_size=32):
         'boxes': boxes,
         'traps': traps,
         'decorations': decorations,
+        'endpoints': endpoints,
     }
