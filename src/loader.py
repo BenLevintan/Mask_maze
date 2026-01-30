@@ -185,10 +185,11 @@ def create_asset_dict(tile_size):
     assets['wg'] = load_texture('green_wall.bmp', tile_size, tile_size, colors['green'])
     assets['wb'] = load_texture('blue_wall.bmp', tile_size, tile_size, colors['blue'])
     assets['w'] = load_texture('white_wall.bmp', tile_size, tile_size, colors['white'])
+    assets['wy'] = load_texture('yellow_wall.bmp', tile_size, tile_size, colors['yellow'])
     
     # Player (smaller - 24x24)
     player_size = 24
-    assets['p'] = load_texture('player.bmp', player_size, player_size, colors['blue'])
+    assets['p'] = load_texture('protagonist_base_right.bmp', player_size, player_size, colors['blue'])
     
     # Enemies - use your mask textures as enemy sprites
     assets['er'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
@@ -205,11 +206,13 @@ def create_asset_dict(tile_size):
     assets['br'] = load_texture('red_box.bmp', tile_size, tile_size, (180, 50, 50))
     
     # Doors and keys
-    assets['dk1'] = load_texture('door_1.bmp', tile_size, tile_size, colors['purple'])
+    assets['dk1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['dk2'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['dk3'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['k1'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
-    assets['dp1'] = load_texture('pressure_door.bmp', tile_size, tile_size, colors['green'])
+    assets['dp1'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])
     assets['pr'] = load_texture('pressure_plate.bmp', tile_size, tile_size, colors['white'])
     
     # Traps
