@@ -14,5 +14,8 @@ for y_counter,line in enumerate(maze_lines):
     print(line)
     for char in line:
         if char=='w':
-            game_object_list.append(Wall())
+            if random.random() < 0.05: # 1/20 chance
+                game_object_list.append(Wall('Wall_cobwebs.bmp'))
+            else:
+                game_object_list.append(Wall('Wall_normal.bmp'))
         x_counter=x_counter+1
