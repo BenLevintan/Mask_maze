@@ -263,7 +263,7 @@ while running:
         
         # Move and check collision (handles both X and Y separately)
         resolve_collision(player, solid_sprites)
-        
+
         # Update mask effects on sprites
         update_mask_effects(player, mask_sprites)
         
@@ -280,12 +280,10 @@ while running:
             key.update(dt)
         
         # Update enemies
-        print(len(enemies))
+
         for enemy in enemies:
-            print(type(enemy))
-            #print('a')
             enemy.update(player)
-        
+            resolve_collision(enemy, solid_sprites)
         # Animate spikes
         for trap in traps:
             if trap.__class__.__name__ == 'Spike':

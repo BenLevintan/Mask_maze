@@ -217,10 +217,10 @@ def create_asset_dict(tile_size):
     assets['p_blue'] = load_texture('protagonist_wolf_right.bmp', player_size, player_size, colors['blue'])
     
     # Enemies - use mask textures as enemy sprites
-    assets['er'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['red'])
-    assets['eg'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['green'])
-    assets['eb'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['blue'])
-    assets['ee'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['yellow'])
+    assets['er'] = load_texture('Ghost_enemy.bmp', tile_size, tile_size, colors['red'])
+    assets['eg'] = load_texture('Ghost_enemy.bmp', tile_size, tile_size, colors['green'])
+    assets['eb'] = load_texture('Ghost_enemy.bmp', tile_size, tile_size, colors['blue'])
+    assets['ee'] = load_texture('Ghost_enemy.bmp', tile_size, tile_size, colors['yellow'])
     
     # Masks
     assets['mr'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
