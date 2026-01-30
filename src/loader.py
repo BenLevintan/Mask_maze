@@ -120,6 +120,33 @@ class GuillotineTrap(pygame.sprite.Sprite):
         self.direction = direction  # 'up', 'down', 'left', 'right'
 
 
+class Spike(pygame.sprite.Sprite):
+    """Spike trap that alternates between open and closed."""
+    def __init__(self, x, y, closed_img, open_img):
+        super().__init__()
+        self.closed_image = closed_img
+        self.open_image = open_img
+        self.image = self.closed_image.copy()
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.is_open = False
+        self.time = 0
+        self.toggle_interval = 2.0  # Toggle every 2 seconds
+    
+    def update(self, time_delta=0.016):
+        """Update spike state - alternate between open and closed."""
+        self.time += time_delta
+        
+        # Toggle state every 2 seconds
+        state = int(self.time / self.toggle_interval) % 2
+        self.is_open = (state == 1)
+        
+        # Update image based on state
+        if self.is_open:
+            self.image = self.open_image.copy()
+        else:
+            self.image = self.closed_image.copy()
+
+
 class Decoration(pygame.sprite.Sprite):
     """Non-collidable decoration sprite."""
     def __init__(self, x, y, sprite_img):
@@ -226,6 +253,10 @@ def create_asset_dict(tile_size):
     # Traps
     for trap_type in ['tau', 'tad', 'tar', 'tal', 'tgu', 'tgd', 'tgr', 'tgl']:
         assets[trap_type] = load_texture(f'{trap_type}.bmp', tile_size, tile_size, colors['purple'])
+    
+    # Spike traps - store both closed and open variants
+    assets['tgr_closed'] = load_texture('spikes_closed.bmp', tile_size, tile_size, (100, 100, 100))
+    assets['tgr_open'] = load_texture('spikes_open.bmp', tile_size, tile_size, (100, 100, 100))
     
     # Decoration
     assets['dec'] = load_texture('decoration.bmp', tile_size, tile_size, (150, 150, 150))
@@ -423,9 +454,15 @@ def load_level(csv_path, tile_size=32):
                         all_sprites.add(trap)
                         traps.add(trap)
                     
+                    # Spike traps (guillotine right with alternating animation)
+                    elif cell == 'tgr':
+                        spike = Spike(x, y, assets['tgr_closed'], assets['tgr_open'])
+                        all_sprites.add(spike)
+                        traps.add(spike)
+                    
                     # Guillotine traps
-                    elif cell in ['tgu', 'tgd', 'tgr', 'tgl']:
-                        direction_map = {'tgu': 'up', 'tgd': 'down', 'tgr': 'right', 'tgl': 'left'}
+                    elif cell in ['tgu', 'tgd', 'tgl']:
+                        direction_map = {'tgu': 'up', 'tgd': 'down', 'tgl': 'left'}
                         trap = GuillotineTrap(x, y, assets[cell], direction_map[cell])
                         all_sprites.add(trap)
                         traps.add(trap)

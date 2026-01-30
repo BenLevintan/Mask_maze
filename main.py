@@ -52,6 +52,7 @@ endpoints = level_data['endpoints']
 doors = level_data['doors']
 keys = level_data['keys']
 enemies = level_data['enemies']
+traps = level_data['traps']
 
 if not player:
     print("Error: No player spawn point found in level!")
@@ -174,10 +175,21 @@ def check_level_complete(player, endpoints):
     return False
 
 
+def check_spike_collision(player, traps):
+    """Check if player hit an open spike. Returns True if hit an open spike."""
+    for trap in traps:
+        if trap.__class__.__name__ == 'Spike':
+            if check_aabb_collision(player.rect, trap.rect):
+                if trap.is_open:
+                    return True
+    return False
+
+
 def next_level():
     """Load the next level."""
-    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys,enemies
-    
+
+    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps
+
     current_level_index += 1
     level_data = load_level_by_index(current_level_index)
     
@@ -193,6 +205,7 @@ def next_level():
     endpoints = level_data['endpoints']
     doors = level_data['doors']
     keys = level_data['keys']
+    traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
     print(f"Level {current_level_index + 1} loaded!")
@@ -201,7 +214,7 @@ def next_level():
 
 def reload_level():
     """Reload the current level from scratch."""
-    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys,enemies
+    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps
     
     level_data = load_level_by_index(current_level_index)
     
@@ -216,6 +229,7 @@ def reload_level():
     endpoints = level_data['endpoints']
     doors = level_data['doors']
     keys = level_data['keys']
+    traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} reloaded!")
@@ -264,10 +278,21 @@ while running:
         # Animate keys with bobbing motion
         for key in keys:
             key.update(dt)
+        
+        # Update enemies
         for enemy in enemies:
             enemy.update()
+        
+        # Animate spikes
+        for trap in traps:
+            if trap.__class__.__name__ == 'Spike':
+                trap.update(dt)
         # Check for key pickup and door opening
         handle_key_pickup(player, keys, doors)
+        
+        # Check for spike collision
+        if check_spike_collision(player, traps):
+            reload_level()
         
         # Check for level completion
         if check_level_complete(player, endpoints):
@@ -280,8 +305,9 @@ while running:
     # Render
     screen.fill((20, 20, 30))
     
-    # Draw sprites with camera offset
-    for sprite in all_sprites:
+    # Draw sprites with camera offset - sort by Y position for proper depth
+    sorted_sprites = sorted(all_sprites, key=lambda sprite: sprite.rect.y)
+    for sprite in sorted_sprites:
         screen.blit(sprite.image, camera.apply(sprite))
     
     # Draw HUD (fixed to screen, not affected by camera)
@@ -290,12 +316,11 @@ while running:
     mask_text = font.render(f"Mask: {player.current_mask or 'None'}", True, (255, 255, 255))
     level_text = font.render(f"Level: {current_level_index + 1}/{len(LEVELS)}", True, (255, 255, 255))
     help_text = font.render("1=Red, 2=Green, 3=Blue, 0=No Mask | R=Reset | Arrow Keys=Move", True, (150, 150, 150))
-
-
-    screen.blit(lives_text, (10, 10))
-    screen.blit(mask_text, (10, 40))
-    screen.blit(level_text, (10, 70))
-    screen.blit(help_text, (10, 100))
+    
+    screen.blit(help_text, (10, HEIGHT - 110))
+    screen.blit(level_text, (10, HEIGHT - 80))
+    screen.blit(mask_text, (10, HEIGHT - 50))
+    screen.blit(lives_text, (10, HEIGHT - 20))
     
     pygame.display.flip()
 
