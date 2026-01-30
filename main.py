@@ -278,12 +278,27 @@ while running:
         # Animate keys with bobbing motion
         for key in keys:
             key.update(dt)
-        
-        # Update enemies
 
+
+
+        # Update enemies
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1484d8152927300dc0dd544db6df6b487812d8bf
         for enemy in enemies:
             enemy.update(player)
+<<<<<<< HEAD
             resolve_collision(enemy, solid_sprites)
+            if check_aabb_collision(player.rect,enemy.rect):
+                enemy_collisions+=1
+                #pygame.time.delay(2)
+                if enemy_collisions>50:
+                    enemy_collisions=0
+                    reload_level()
+=======
+            resolve_collision(enemy, solid_sprites)
+>>>>>>> 1484d8152927300dc0dd544db6df6b487812d8bf
         # Animate spikes
         for trap in traps:
             if trap.__class__.__name__ == 'Spike':
