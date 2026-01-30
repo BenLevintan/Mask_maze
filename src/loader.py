@@ -1,7 +1,8 @@
 import pygame
 import os
 from .entities import Wall, Player, Character
-
+import math
+import random
 
 class Enemy(Character):
     """Base enemy class."""
