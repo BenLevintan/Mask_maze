@@ -21,5 +21,8 @@ tar - trap arrows right
 tal - trap arrows left 
 tgu - trap gilutin up 
 tgr - trap gilutin right 
+b   - box colorless
 br  - box red
+bg  - box green
+bb  - box blue
 end - the level endpoint
