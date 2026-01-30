@@ -264,7 +264,8 @@ while running:
         # Animate keys with bobbing motion
         for key in keys:
             key.update(dt)
-        
+        for enemy in enemies:
+            enemy.update(dt)
         # Check for key pickup and door opening
         handle_key_pickup(player, keys, doors)
         
@@ -289,7 +290,8 @@ while running:
     mask_text = font.render(f"Mask: {player.current_mask or 'None'}", True, (255, 255, 255))
     level_text = font.render(f"Level: {current_level_index + 1}/{len(LEVELS)}", True, (255, 255, 255))
     help_text = font.render("1=Red, 2=Green, 3=Blue, 0=No Mask | R=Reset | Arrow Keys=Move", True, (150, 150, 150))
-    
+
+
     screen.blit(lives_text, (10, 10))
     screen.blit(mask_text, (10, 40))
     screen.blit(level_text, (10, 70))
