@@ -49,6 +49,8 @@ all_sprites = level_data['all_sprites']
 solid_sprites = level_data['solid_sprites']
 mask_sprites = level_data['mask_sprites']
 endpoints = level_data['endpoints']
+doors = level_data['doors']
+keys = level_data['keys']
 
 if not player:
     print("Error: No player spawn point found in level!")
@@ -149,6 +151,20 @@ def handle_mask_pickup(player, mask_sprites):
                     mask_obj.kill()
 
 
+def handle_key_pickup(player, keys, doors):
+    """Check if player collects a key and open corresponding door."""
+    for key in keys:
+        if check_aabb_collision(player.rect, key.rect):
+            # Find and open the corresponding door
+            for door in doors:
+                if door.door_id == key.key_id:
+                    door.open_door()
+                    # Remove door from solid_sprites so it's not collidable
+                    if door in solid_sprites:
+                        solid_sprites.remove(door)
+            key.kill()
+
+
 def check_level_complete(player, endpoints):
     """Check if player reached the level endpoint."""
     for endpoint in endpoints:
@@ -159,7 +175,7 @@ def check_level_complete(player, endpoints):
 
 def next_level():
     """Load the next level."""
-    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera
+    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys
     
     current_level_index += 1
     level_data = load_level_by_index(current_level_index)
@@ -174,6 +190,8 @@ def next_level():
     solid_sprites = level_data['solid_sprites']
     mask_sprites = level_data['mask_sprites']
     endpoints = level_data['endpoints']
+    doors = level_data['doors']
+    keys = level_data['keys']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} loaded!")
@@ -182,7 +200,7 @@ def next_level():
 
 def reload_level():
     """Reload the current level from scratch."""
-    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera
+    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys
     
     level_data = load_level_by_index(current_level_index)
     
@@ -195,6 +213,8 @@ def reload_level():
     solid_sprites = level_data['solid_sprites']
     mask_sprites = level_data['mask_sprites']
     endpoints = level_data['endpoints']
+    doors = level_data['doors']
+    keys = level_data['keys']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} reloaded!")
@@ -234,6 +254,18 @@ while running:
         
         # Check for mask pickup
         handle_mask_pickup(player, all_sprites)
+        
+        # Animate masks with bobbing motion
+        for mask in mask_sprites:
+            if mask.__class__.__name__ == 'Mask':
+                mask.update(dt)
+        
+        # Animate keys with bobbing motion
+        for key in keys:
+            key.update(dt)
+        
+        # Check for key pickup and door opening
+        handle_key_pickup(player, keys, doors)
         
         # Check for level completion
         if check_level_complete(player, endpoints):

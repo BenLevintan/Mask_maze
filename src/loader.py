@@ -17,12 +17,22 @@ class Enemy(Character):
 
 
 class Mask(pygame.sprite.Sprite):
-    """Mask object that player can pick up."""
+    """Mask object that player can pick up - has subtle bobbing animation."""
     def __init__(self, x, y, sprite_img, color):
         super().__init__()
         self.image = sprite_img
+        self.base_y = y  # Store the base Y position
         self.rect = self.image.get_rect(topleft=(x, y))
         self.color = color
+        self.time = 0  # For animation timing
+    
+    def update(self, time_delta=0.016):
+        """Update animation - subtle bobbing motion."""
+        import math
+        self.time += time_delta
+        # Sine wave animation - amplitude of 8 pixels, same speed as keys
+        bob_amount = math.sin(self.time * 3) * 8
+        self.rect.y = self.base_y + bob_amount
 
 
 class Box(pygame.sprite.Sprite):
@@ -44,15 +54,41 @@ class Door(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
         self.door_id = door_id
         self.is_open = False
+        self.base_image = sprite_img.copy()
+    
+    def open_door(self):
+        """Open the door - make it non-collidable."""
+        self.is_open = True
+        # Make door semi-transparent
+        transparent_image = self.base_image.copy()
+        transparent_image.set_alpha(100)
+        self.image = transparent_image
+    
+    def close_door(self):
+        """Close the door - make it solid again."""
+        self.is_open = False
+        self.image = self.base_image.copy()
+        self.image.set_alpha(255)
 
 
 class Key(pygame.sprite.Sprite):
-    """Key that opens a door."""
+    """Key that opens a door - has subtle bobbing animation."""
     def __init__(self, x, y, sprite_img, key_id):
         super().__init__()
         self.image = sprite_img
+        self.base_y = y  # Store the base Y position
         self.rect = self.image.get_rect(topleft=(x, y))
         self.key_id = key_id
+        self.time = 0  # For animation timing
+        self.x = x  # Store x position
+    
+    def update(self, time_delta=0.016):
+        """Update animation - slight bobbing motion."""
+        import math
+        self.time += time_delta
+        # Sine wave animation - amplitude of 8 pixels, slower movement
+        bob_amount = math.sin(self.time * 3) * 8
+        self.rect.y = self.base_y + bob_amount
 
 
 class PressPlate(pygame.sprite.Sprite):
@@ -170,7 +206,9 @@ def create_asset_dict(tile_size):
     
     # Doors and keys
     assets['dk1'] = load_texture('door_1.bmp', tile_size, tile_size, colors['purple'])
-    assets['k1'] = load_texture('key_1.bmp', tile_size, tile_size, colors['yellow'])
+    assets['k1'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
+    assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
+    assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['dp1'] = load_texture('pressure_door.bmp', tile_size, tile_size, colors['green'])
     assets['pr'] = load_texture('pressure_plate.bmp', tile_size, tile_size, colors['white'])
     
@@ -326,9 +364,10 @@ def load_level(csv_path, tile_size=32):
                         solid_sprites.add(door)
                         doors.add(door)
                     
-                    # Key 1
-                    elif cell == 'k1':
-                        key = Key(x, y, assets['k1'], 1)
+                    # Key 1, 2, 3
+                    elif cell in ['k1', 'k2', 'k3']:
+                        key_id = int(cell[1])
+                        key = Key(x, y, assets[cell], key_id)
                         all_sprites.add(key)
                         keys.add(key)
                     
