@@ -157,6 +157,9 @@ def load_texture(filename, width, height, fallback_color):
             # Scale to tile size if needed
             if img.get_size() != (width, height):
                 img = pygame.transform.scale(img, (width, height))
+            # Convert to alpha and set black as transparent
+            img = img.convert_alpha()
+            img.set_colorkey((0, 0, 0))  # Make black pixels transparent
             return img
     except pygame.error as e:
         print(f"Warning: Could not load {filename}: {e}")
@@ -187,17 +190,20 @@ def create_asset_dict(tile_size):
     assets['w'] = load_texture('white_wall.bmp', tile_size, tile_size, colors['white'])
     assets['wy'] = load_texture('yellow_wall.bmp', tile_size, tile_size, colors['yellow'])
     
-    # Player (smaller - 24x24)
+    # Player (24x24) with sprite variants for each mask
     player_size = 24
     assets['p'] = load_texture('protagonist_base_right.bmp', player_size, player_size, colors['blue'])
+    assets['p_red'] = load_texture('protagonist_bear_right.bmp', player_size, player_size, colors['red'])
+    assets['p_green'] = load_texture('protagonist_turtle_right.bmp', player_size, player_size, colors['green'])
+    assets['p_blue'] = load_texture('protagonist_wolf_right.bmp', player_size, player_size, colors['blue'])
     
-    # Enemies - use your mask textures as enemy sprites
+    # Enemies - use mask textures as enemy sprites
     assets['er'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
     assets['eg'] = load_texture('green_turtle_mask_32.bmp', tile_size, tile_size, colors['green'])
     assets['eb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
     assets['ee'] = load_texture('yellow_enemy.bmp', tile_size, tile_size, colors['yellow'])
     
-    # Masks - use your mask textures
+    # Masks
     assets['mr'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
     assets['mg'] = load_texture('green_turtle_mask_32.bmp', tile_size, tile_size, colors['green'])
     assets['mb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
@@ -274,7 +280,12 @@ def load_level(csv_path, tile_size=32):
                     
                     # Player
                     if cell == 'p':
-                        player = Player(x + (tile_size - 24) // 2, y + (tile_size - 24) // 2, assets['p'], lives=3)
+                        sprite_variants = {
+                            'red': assets['p_red'],
+                            'green': assets['p_green'],
+                            'blue': assets['p_blue']
+                        }
+                        player = Player(x + (tile_size - 24) // 2, y + (tile_size - 24) // 2, assets['p'], lives=3, sprite_variants=sprite_variants)
                         all_sprites.add(player)
                     
                     # Neutral wall
@@ -306,6 +317,13 @@ def load_level(csv_path, tile_size=32):
                         all_sprites.add(wall)
                         solid_sprites.add(wall)
                         mask_sprites.add(wall)
+                    
+                    # Yellow wall
+                    elif cell == 'wy':
+                        wall = Wall(x, y, assets['wy'], tile_size, color='yellow')
+                        wall.color = 'yellow'
+                        all_sprites.add(wall)
+                        solid_sprites.add(wall)
                     
                     # Red mask
                     elif cell == 'mr':
