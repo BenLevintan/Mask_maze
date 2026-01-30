@@ -13,9 +13,9 @@ WIDTH, HEIGHT = 1600, 960
 
 # Level list - order matters
 LEVELS = [
-    'test_lvl.csv',
-    'maze_level_1.csv',
-    'maze_level_2.csv',
+    #'test_lvl.csv',
+    #'maze_level_1.csv',
+    #'maze_level_2.csv',
     'maze_level_3.csv',
 ]
 
@@ -280,8 +280,11 @@ while running:
             key.update(dt)
         
         # Update enemies
+        print(len(enemies))
         for enemy in enemies:
-            enemy.update()
+            print(type(enemy))
+            #print('a')
+            enemy.update(player)
         
         # Animate spikes
         for trap in traps:

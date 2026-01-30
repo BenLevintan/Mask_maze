@@ -1,20 +1,10 @@
 import pygame
 import os
-from .entities import Wall, Player, Character
+from .entities import Wall, Player, Character,Enemy
 import math
 import random
 
-class Enemy(Character):
-    """Base enemy class."""
-    def __init__(self, x, y, sprite_img, color, lives=1):
-        super().__init__(x, y, sprite_img, lives)
-        self.color = color
-        self.speed = 2
-        self.velocity = pygame.math.Vector2(0, 0)
 
-    def update(self):
-        self.pos += self.velocity
-        self.rect.topleft = self.pos
 
 
 class Mask(pygame.sprite.Sprite):
@@ -227,10 +217,10 @@ def create_asset_dict(tile_size):
     assets['p_blue'] = load_texture('protagonist_wolf_right.bmp', player_size, player_size, colors['blue'])
     
     # Enemies - use mask textures as enemy sprites
-    assets['er'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])
-    assets['eg'] = load_texture('green_turtle_mask_32.bmp', tile_size, tile_size, colors['green'])
-    assets['eb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
-    assets['ee'] = load_texture('yellow_enemy.bmp', tile_size, tile_size, colors['yellow'])
+    assets['er'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['red'])
+    assets['eg'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['green'])
+    assets['eb'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['blue'])
+    assets['ee'] = load_texture('yallow_wall.bmp', tile_size, tile_size, colors['yellow'])
     
     # Masks
     assets['mr'] = load_texture('red_bear_mask_32.bmp', tile_size, tile_size, colors['red'])

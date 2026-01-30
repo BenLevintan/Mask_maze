@@ -98,28 +98,30 @@ class Player(Character):
 
 
 class Enemy(Character):
-    def __init__(self, x, y, sprite_img, lives=3, sprite_variants=None):
+    def __init__(self, x, y, sprite_img, color, lives=3,sprite_variants=None):
         super().__init__(x, y, sprite_img, lives)
         self.current_mask = None  # Holds the color of the current mask
         self.speed = 4
         self.facing_right = True  # Track sprite direction
         self.base_image = sprite_img.copy()  # Store original sprite
         self.sprite_variants = sprite_variants or {}  # Dict of mask color -> sprite image
-
+        print('b')
     def set_speed(self,player):
-        self.velocity=(5/((self.pos - player.pos)**2))*(self.pos - player.pos)
-        if (self.pos-player.pos)**2 <150:
-            self.velocity=self.velocity*5
-        # Update sprite direction based on movement
-        if self.velocity.x > 0:  # Moving right
-            if not self.facing_right:
-                self.facing_right = True
-                self._update_sprite_display()
-        elif self.velocity.x < 0:  # Moving left
-            if self.facing_right:
-                self.facing_right = False
-                self._update_sprite_display()
+        #self.velocity=(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[0] - player.pos[0]) ,(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[1] - player.pos[1])
+        if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<150:
+            speed_factor=5
+        else:
+            speed_factor=1
 
+
+        if player.pos[0]-self.pos[0]<0:
+            self.velocity[0]=-speed_factor
+        if player.pos[0] - self.pos[0] > 0:
+            self.velocity[0] = speed_factor
+        if player.pos[1]-self.pos[1]<0:
+            self.velocity[1]=-speed_factor
+        if player.pos[1] - self.pos[1] > 0:
+            self.velocity[1] = speed_factor
     def _update_sprite_display(self):
         """Update the displayed sprite based on current mask and facing direction."""
         # Get the current sprite (base or masked variant)
@@ -133,11 +135,15 @@ class Enemy(Character):
         else:
             self.image = current_sprite.copy()
 
-    def update(self):
+    def update(self,player):
         """Update player position."""
+        print('a')
+        print(self.velocity)
+        print(self.pos)
+        print(self.velocity)
         self.pos += self.velocity
         self.rect.topleft = self.pos
-        self.set_speed()
+        self.set_speed(player)
 
     def equip_mask(self, color):
         """Equip a mask and change sprite."""
