@@ -234,13 +234,27 @@ class Key(pygame.sprite.Sprite):
 
 class PressPlate(pygame.sprite.Sprite):
     """Pressure plate that triggers doors."""
-
+    is_pressed = False
+    debouncing = False
+    door_list = []
     def __init__(self, x, y, sprite_img, plate_id):
         super().__init__()
         self.image = sprite_img
         self.rect = self.image.get_rect(topleft=(x, y))
         self.plate_id = plate_id
         self.is_pressed = False
+    def press(self):
+        self.is_pressed=True
+    def depress(self):
+        self.is_pressed=False
+    def change_doors(self):
+        for door in self.door_list:
+            if door.is_open:
+                door.close_door()
+            else:
+                door.open_door()
+
+
 
 
 class ArrowTrap(pygame.sprite.Sprite):
