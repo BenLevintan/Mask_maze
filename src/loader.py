@@ -230,7 +230,9 @@ def create_asset_dict(tile_size):
     
     # Endpoint (flag)
     assets['end'] = load_texture('level_end.bmp', tile_size, tile_size, colors['green'])
-    
+
+    # enemies
+    assets['end'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])
     return assets
 
 
@@ -254,7 +256,8 @@ def load_level(csv_path, tile_size=32):
     traps = pygame.sprite.Group()
     decorations = pygame.sprite.Group()
     endpoints = pygame.sprite.Group()
-    
+    enemies=pygame.sprite.Group()
+
     # Create asset placeholders
     assets = create_asset_dict(tile_size)
     
