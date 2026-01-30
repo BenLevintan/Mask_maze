@@ -15,7 +15,11 @@ mg  - mask red
 mb  - mask red
 dec - deceration
 p   - player
-tau - trap arrows up (u,d,r,l - up,down,right,left) 
-tgu - trap gilutin up (u,d,r,l - up,down,right,left) 
+tau - trap arrows up 
+tad - trap arrows down 
+tar - trap arrows right 
+tal - trap arrows left 
+tgu - trap gilutin up 
+tgr - trap gilutin right 
 br  - box red
 end - the level endpoint
