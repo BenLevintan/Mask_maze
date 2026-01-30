@@ -265,7 +265,7 @@ while running:
         for key in keys:
             key.update(dt)
         for enemy in enemies:
-            enemy.update(dt)
+            enemy.update()
         # Check for key pickup and door opening
         handle_key_pickup(player, keys, doors)
         
@@ -274,7 +274,7 @@ while running:
             if not next_level():
                 running = False
         
-        # Update camera to follow player
+        # Update camera to follow payer
         camera.update(player)
     
     # Render
