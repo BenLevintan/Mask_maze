@@ -263,9 +263,7 @@ def create_asset_dict(tile_size):
     
     # Endpoint (flag)
     assets['end'] = load_texture('level_end.bmp', tile_size, tile_size, colors['green'])
-
-    # enemies
-    assets['end'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])
+    
     return assets
 
 
