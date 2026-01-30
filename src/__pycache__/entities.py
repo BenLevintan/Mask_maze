@@ -105,7 +105,6 @@ class Enemy(Character):
         self.facing_right = True  # Track sprite direction
         self.base_image = sprite_img.copy()  # Store original sprite
         self.sprite_variants = sprite_variants or {}  # Dict of mask color -> sprite image
-        print('b')
     def set_speed(self,player):
         #self.velocity=(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[0] - player.pos[0]) ,(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[1] - player.pos[1])
         if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<150:
@@ -137,10 +136,8 @@ class Enemy(Character):
 
     def update(self,player):
         """Update player position."""
-        print('a')
-        print(self.velocity)
-        print(self.pos)
-        print(self.velocity)
+
+
         self.pos += self.velocity
         self.rect.topleft = self.pos
         self.set_speed(player)
@@ -154,3 +151,160 @@ class Enemy(Character):
         """Remove the current mask and change sprite."""
         self.current_mask = None
         self._update_sprite_display()
+
+
+class Mask(pygame.sprite.Sprite):
+    """Mask object that player can pick up - has subtle bobbing animation."""
+
+    def __init__(self, x, y, sprite_img, color):
+        super().__init__()
+        self.image = sprite_img
+        self.base_y = y  # Store the base Y position
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.color = color
+        self.time = 0  # For animation timing
+
+    def update(self, time_delta=0.016):
+        """Update animation - subtle bobbing motion."""
+        import math
+        self.time += time_delta
+        # Sine wave animation - amplitude of 8 pixels, same speed as keys
+        bob_amount = math.sin(self.time * 3) * 8
+        self.rect.y = self.base_y + bob_amount
+
+
+class Box(pygame.sprite.Sprite):
+    """Pushable box with color coding."""
+
+    def __init__(self, x, y, sprite_img, color):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.color = color
+        self.pos = pygame.math.Vector2(x, y)
+        self.on_off = True  # Collision state toggle
+
+
+class Door(pygame.sprite.Sprite):
+    """Door that requires a key."""
+
+    def __init__(self, x, y, sprite_img, door_id):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.door_id = door_id
+        self.is_open = False
+        self.base_image = sprite_img.copy()
+
+    def open_door(self):
+        """Open the door - make it non-collidable."""
+        self.is_open = True
+        # Make door semi-transparent
+        transparent_image = self.base_image.copy()
+        transparent_image.set_alpha(100)
+        self.image = transparent_image
+
+    def close_door(self):
+        """Close the door - make it solid again."""
+        self.is_open = False
+        self.image = self.base_image.copy()
+        self.image.set_alpha(255)
+
+
+class Key(pygame.sprite.Sprite):
+    """Key that opens a door - has subtle bobbing animation."""
+
+    def __init__(self, x, y, sprite_img, key_id):
+        super().__init__()
+        self.image = sprite_img
+        self.base_y = y  # Store the base Y position
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.key_id = key_id
+        self.time = 0  # For animation timing
+        self.x = x  # Store x position
+
+    def update(self, time_delta=0.016):
+        """Update animation - slight bobbing motion."""
+        import math
+        self.time += time_delta
+        # Sine wave animation - amplitude of 8 pixels, slower movement
+        bob_amount = math.sin(self.time * 3) * 8
+        self.rect.y = self.base_y + bob_amount
+
+
+class PressPlate(pygame.sprite.Sprite):
+    """Pressure plate that triggers doors."""
+
+    def __init__(self, x, y, sprite_img, plate_id):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.plate_id = plate_id
+        self.is_pressed = False
+
+
+class ArrowTrap(pygame.sprite.Sprite):
+    """Arrow trap that shoots in a direction."""
+
+    def __init__(self, x, y, sprite_img, direction):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.direction = direction  # 'up', 'down', 'left', 'right'
+
+
+class GuillotineTrap(pygame.sprite.Sprite):
+    """Guillotine trap that falls in a direction."""
+
+    def __init__(self, x, y, sprite_img, direction):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.direction = direction  # 'up', 'down', 'left', 'right'
+
+
+class Spike(pygame.sprite.Sprite):
+    """Spike trap that alternates between open and closed."""
+
+    def __init__(self, x, y, closed_img, open_img):
+        super().__init__()
+        self.closed_image = closed_img
+        self.open_image = open_img
+        self.image = self.closed_image.copy()
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.is_open = False
+        self.time = 0
+        self.toggle_interval = 2.0  # Toggle every 2 seconds
+
+    def update(self, time_delta=0.016):
+        """Update spike state - alternate between open and closed."""
+        self.time += time_delta
+
+        # Toggle state every 2 seconds
+        state = int(self.time / self.toggle_interval) % 2
+        self.is_open = (state == 1)
+
+        # Update image based on state
+        if self.is_open:
+            self.image = self.open_image.copy()
+        else:
+            self.image = self.closed_image.copy()
+
+
+class Decoration(pygame.sprite.Sprite):
+    """Non-collidable decoration sprite."""
+
+    def __init__(self, x, y, sprite_img):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+
+class Endpoint(pygame.sprite.Sprite):
+    """Level endpoint - player reaches here to complete level."""
+
+    def __init__(self, x, y, sprite_img):
+        super().__init__()
+        self.image = sprite_img
+        self.rect = self.image.get_rect(topleft=(x, y))
+
