@@ -187,7 +187,8 @@ def create_asset_dict(tile_size):
     assets['wr'] = load_texture('red_wall.bmp', tile_size, tile_size, colors['red'])
     assets['wg'] = load_texture('green_wall.bmp', tile_size, tile_size, colors['green'])
     assets['wb'] = load_texture('blue_wall.bmp', tile_size, tile_size, colors['blue'])
-    assets['w'] = load_texture('white_wall.bmp', tile_size, tile_size, colors['white'])
+    assets['w_normal'] = load_texture('Wall_normal.bmp', tile_size, tile_size, colors['white'])
+    assets['w_cobweb'] = load_texture('Wall_cobwebs.bmp', tile_size, tile_size, colors['white'])
     assets['wy'] = load_texture('yellow_wall.bmp', tile_size, tile_size, colors['yellow'])
     
     # Player (24x24) with sprite variants for each mask
@@ -293,7 +294,13 @@ def load_level(csv_path, tile_size=32):
                     
                     # Neutral wall
                     elif cell == 'w':
-                        wall = Wall(x, y, assets['w'], tile_size)
+                        # 5% chance for cobweb wall
+                        if random.random() < 0.05:
+                            wall_img = assets['w_cobweb']
+                        else:
+                            wall_img = assets['w_normal']
+                            
+                        wall = Wall(x, y, wall_img, tile_size)
                         all_sprites.add(wall)
                         solid_sprites.add(wall)
                     
