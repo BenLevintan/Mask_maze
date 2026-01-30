@@ -51,6 +51,7 @@ mask_sprites = level_data['mask_sprites']
 endpoints = level_data['endpoints']
 doors = level_data['doors']
 keys = level_data['keys']
+enemies = level_data['enemies']
 
 if not player:
     print("Error: No player spawn point found in level!")
@@ -175,7 +176,7 @@ def check_level_complete(player, endpoints):
 
 def next_level():
     """Load the next level."""
-    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys
+    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys,enemies
     
     current_level_index += 1
     level_data = load_level_by_index(current_level_index)
@@ -184,7 +185,7 @@ def next_level():
         # No more levels
         print("You beat all levels! Congratulations!")
         return False
-    
+    enemies=level_data['enemies']
     player = level_data['player']
     all_sprites = level_data['all_sprites']
     solid_sprites = level_data['solid_sprites']
@@ -193,21 +194,21 @@ def next_level():
     doors = level_data['doors']
     keys = level_data['keys']
     camera = Camera(WIDTH, HEIGHT)
-    
+    enemies = level_data['enemies']
     print(f"Level {current_level_index + 1} loaded!")
     return True
 
 
 def reload_level():
     """Reload the current level from scratch."""
-    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys
+    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys,enemies
     
     level_data = load_level_by_index(current_level_index)
     
     if not level_data:
         print("Error: Could not reload level!")
         return False
-    
+    enemies=level_data['enemies']
     player = level_data['player']
     all_sprites = level_data['all_sprites']
     solid_sprites = level_data['solid_sprites']
