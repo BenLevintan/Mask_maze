@@ -1,6 +1,8 @@
 import pygame
 import sys
 
+TILE_SIZE = 32
+
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
