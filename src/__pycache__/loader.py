@@ -1,7 +1,8 @@
 import pygame
 import os
-from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint
-import math
+
+from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint,PressPlate
+
 import random
 
 
@@ -91,8 +92,10 @@ def create_asset_dict(tile_size):
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['dp1'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])
-    assets['pr'] = load_texture('pressure_plate.bmp', tile_size, tile_size, colors['white'])
-    
+    assets['pr'] = load_texture('press.bmp', tile_size, tile_size, colors['white'])
+
+
+
     # Traps
     for trap_type in ['tau', 'tad', 'tar', 'tal', 'tgu', 'tgd', 'tgr', 'tgl']:
         assets[trap_type] = load_texture(f'{trap_type}.bmp', tile_size, tile_size, colors['purple'])
@@ -122,7 +125,6 @@ def load_level(csv_path, tile_size=32):
     all_sprites = pygame.sprite.Group()
     solid_sprites = pygame.sprite.Group()
     mask_sprites = pygame.sprite.Group()  # Colored sprites affected by masks
-    enemies = pygame.sprite.Group()
     doors = pygame.sprite.Group()
     keys = pygame.sprite.Group()
     plates = pygame.sprite.Group()
@@ -283,7 +285,8 @@ def load_level(csv_path, tile_size=32):
                         doors.add(door)
                     
                     # Pressure plate 1
-                    elif cell == 'pr':
+                    elif cell in ['p1','p2','p3']:
+                        print('making plate')
                         plate = PressPlate(x, y, assets['pr'], 1)
                         all_sprites.add(plate)
                         plates.add(plate)
@@ -332,9 +335,9 @@ def load_level(csv_path, tile_size=32):
         'mask_sprites': mask_sprites,
         'doors': doors,
         'keys': keys,
-        'plates': plates,
         'boxes': boxes,
         'traps': traps,
         'decorations': decorations,
         'endpoints': endpoints,
+        'presses': plates,
     }

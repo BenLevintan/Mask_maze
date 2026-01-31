@@ -239,6 +239,7 @@ class PressPlate(pygame.sprite.Sprite):
     door_list = []
     def __init__(self, x, y, sprite_img, plate_id):
         super().__init__()
+        self.pos=[x,y]
         self.image = sprite_img
         self.rect = self.image.get_rect(topleft=(x, y))
         self.plate_id = plate_id
@@ -253,6 +254,11 @@ class PressPlate(pygame.sprite.Sprite):
                 door.close_door()
             else:
                 door.open_door()
+    def update(self,boxes, time_delta=0.016):
+        for box in boxes:
+            if box.pos[0]==self.pos[0] and box.pos[1]==self.pos[1]:
+                self.press()
+
 
 
 
