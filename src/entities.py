@@ -1,7 +1,4 @@
-from doctest import debug
-
 import pygame
-from pygame.examples.go_over_there import clock
 
 
 class Wall(pygame.sprite.Sprite):

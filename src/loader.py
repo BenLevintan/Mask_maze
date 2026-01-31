@@ -1,7 +1,7 @@
 import pygame
 import os
 
-from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint,PressPlate
+from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint,PressPlate,Key,ArrowTrap,Spike,GuillotineTrap,Decoration
 
 import random
 
@@ -92,7 +92,10 @@ def create_asset_dict(tile_size):
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['pr'] = load_texture('press.bmp', tile_size, tile_size, colors['white'])
-
+    assets['dk1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dk2'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dk3'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dp1'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])   # ADD THIS
 
 
     # Traps
@@ -277,7 +280,7 @@ def load_level(csv_path, tile_size=32):
                         keys.add(key)
                     
                     # Door
-                    elif cell in ['d1',',d2','d3']:
+                    elif cell in ['d1','d2','d3']:
                         door = Door(x, y, assets[cell], cell[1])
                         all_sprites.add(door)
                         solid_sprites.add(door)

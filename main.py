@@ -1,6 +1,8 @@
 import pygame
 import sys
 import os
+from glob import glob
+from src.audio import SoundManager
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
@@ -9,17 +11,39 @@ from src.loader import load_level
 from src.entities import Player, Wall
 
 TILE_SIZE = 32
-WIDTH, HEIGHT = 1600, 960
+WIDTH, HEIGHT = 800, 600
 
 # Level list - order matters
 LEVELS = [
     #'test_lvl.csv',
     #'maze_level_1.csv',
-    #'maze_level_2.csv',
+    'maze_level_2.csv',
     'maze_level_3.csv',
 ]
 
+pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
 pygame.init()
+
+# After pygame.init()
+assets_path = os.path.join(os.path.dirname(__file__), 'assets', 'game sound')
+sound_manager = SoundManager(assets_path)
+
+# Load sound effects
+sound_manager.load_sound('key', 'sound effects/key/key1.wav')
+sound_manager.load_sound('trap', 'sound effects/trap/trap1.wav')
+sound_manager.load_sound('button', 'sound effects/button/button1.wav')
+
+# Load drag sound variants (for door opening)
+drag_sounds = glob(os.path.join(assets_path, 'sound effects', 'drag', '*.wav'))
+sound_manager.load_sound_variants('drag', drag_sounds)
+
+# Load hurt sound variants (for taking damage)
+hurt_sounds = glob(os.path.join(assets_path, 'sound effects', 'hurt', '*.wav'))
+sound_manager.load_sound_variants('hurt', hurt_sounds)
+
+# Start background music
+sound_manager.play_music('music/MainMusic.wav')
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Masks - Game Jam")
 
@@ -151,6 +175,7 @@ def handle_mask_pickup(player, mask_sprites):
             if isinstance(mask_obj, type(player)) or mask_obj.__class__.__name__ == 'Mask':
                 if check_aabb_collision(player.rect, mask_obj.rect):
                     player.equip_mask(mask_obj.color)
+                    sound_manager.play_sound('button')
                     mask_obj.kill()
 
 
@@ -162,6 +187,7 @@ def handle_key_pickup(player, keys, doors):
             for door in doors:
                 if door.door_id == key.key_id:
                     door.open_door()
+                    sound_manager.play_sound('drag')  # Play random drag sound
                     # Remove door from solid_sprites so it's not collidable
                     if door in solid_sprites:
                         solid_sprites.remove(door)
@@ -209,7 +235,7 @@ def next_level():
     traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
-    plate_presses=level_data['plate_presses']
+    plate_presses=level_data['presses']
     boxes = level_data['boxes']
     print(f"Level {current_level_index + 1} loaded!")
 
@@ -234,7 +260,7 @@ def reload_level():
     doors = level_data['doors']
     keys = level_data['keys']
     traps = level_data['traps']
-    plate_presses = level_data['plate_presses']
+    plate_presses = level_data['presses']
     boxes = level_data['boxes']
     camera = Camera(WIDTH, HEIGHT)
     
@@ -293,6 +319,12 @@ while running:
 
         #check press
         for press in plate_presses:
+            was_pressed = press.is_pressed
+            press.update(boxes,player, dt)
+            # If plate just got pressed, toggle doors and play sound
+            if press.is_pressed and not was_pressed:
+                press.change_doors()
+                sound_manager.play_sound('drag')
             press.update(boxes,player,dt)
 
 
@@ -304,16 +336,22 @@ while running:
                 enemy_collisions+=1
                 if enemy_collisions>50:
                     enemy_collisions=0
+                    sound_manager.play_sound('hurt')
                     reload_level()
         # Animate spikes
         for trap in traps:
             if trap.__class__.__name__ == 'Spike':
+                was_open = trap.is_open
                 trap.update(dt)
+                # Play trap sound when spike activates
+                if trap.is_open and not was_open:
+                    sound_manager.play_sound('trap')
         # Check for key pickup and door opening
         handle_key_pickup(player, keys, doors)
         
         # Check for spike collision
         if check_spike_collision(player, traps):
+            sound_manager.play_sound('hurt')
             reload_level()
         
         # Check for level completion
