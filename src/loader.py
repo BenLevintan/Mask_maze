@@ -281,18 +281,18 @@ def load_level(csv_path, tile_size=32):
                     
                     # Door
                     elif cell in ['d1','d2','d3']:
-                        door = Door(x, y, assets[cell], cell[1])
+                        door = Door(x, y, assets[cell], int(cell[1]))
                         all_sprites.add(door)
                         solid_sprites.add(door)
                         doors.add(door)
                     
                     # Pressure plate 1 not debounce
                     elif cell in ['p1','p2','p3']:
-                        plate = PressPlate(x, y, assets['pr'], cell[1])
+                        plate = PressPlate(x, y, assets['pr'], int(cell[1]))
                         all_sprites.add(plate)
                         plates.add(plate)
                     elif cell in ['p1d', 'p2d', 'p3d']:
-                        plate = PressPlate(x, y, assets['pr'], cell[1],debounce=True)
+                        plate = PressPlate(x, y, assets['pr'], int(cell[1]),debounce=True)
                         all_sprites.add(plate)
                         plates.add(plate)
                     

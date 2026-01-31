@@ -30,7 +30,7 @@ sound_manager = SoundManager(assets_path)
 
 # Load sound effects
 sound_manager.load_sound('key', 'sound effects/key/key1.wav')
-sound_manager.load_sound('trap', 'sound effects/trap/trap1.wav', volume=0.3)
+sound_manager.load_sound('trap', 'sound effects/trap/trap1.wav', volume=0.5)
 sound_manager.load_sound('button', 'sound effects/button/button1.wav')
 
 # Load drag sound variants (for door opening)
@@ -45,7 +45,7 @@ sound_manager.load_sound_variants('hurt', hurt_sounds)
 sound_manager.play_music('music/MainMusic.wav')
 
 # Load chase music
-sound_manager.load_chase_music('music/ChaseMusic.wav')
+sound_manager.load_chase_music('music/ChaseMusic.wav', volume=0.3)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Masks - Game Jam")

@@ -6,7 +6,7 @@ class SoundManager:
     def __init__(self, base_path):
         self.base_path = base_path
         self.sounds = {}
-        self.music_volume = 0.5
+        self.music_volume = 0.9
         self.sfx_volume = 0.7
         # Chase music system
         self.main_music_path = None
@@ -46,11 +46,11 @@ class SoundManager:
         pygame.mixer.music.set_volume(self.music_volume)
         pygame.mixer.music.play(loop)
     
-    def load_chase_music(self, filepath):
+    def load_chase_music(self, filepath, volume=None):
         """Load chase music as a Sound object for independent playback."""
         full_path = os.path.join(self.base_path, filepath)
         self.chase_music = pygame.mixer.Sound(full_path)
-        self.chase_music.set_volume(self.music_volume)
+        self.chase_music.set_volume(volume if volume is not None else self.music_volume)
         # Reserve a channel for chase music
         self.chase_channel = pygame.mixer.Channel(7)  # Use channel 7 for chase music
     
