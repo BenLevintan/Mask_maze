@@ -15,7 +15,23 @@ WIDTH, HEIGHT = 800, 600
 
 # Level list - order matters
 LEVELS = [
-    'maze_level_5.csv'
+    '_tutorial_0.csv',
+    '_tutorial_1.csv',
+    '_tutorial_2.csv',    
+    '_wall_level_1.csv',
+    '_tutorial_spike_1.csv',     
+    '_tutorial_spike_2.csv',
+    '_level_1.csv',
+    '_level_2.csv', 
+    '_tutorial_ghost_0.csv',  
+    '_tutorial_ghost.csv',
+    'maze_level_2.csv', 
+    'maze_level_3.csv',
+    'maze_level_4.csv',
+    'maze_level_omri1.csv',
+    'maze_level_omri2.csv',
+    'ghost_boss.csv',
+    'you_win.csv'
 ]
 
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)

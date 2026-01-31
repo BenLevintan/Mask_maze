@@ -1,0 +1,20 @@
+LEVELS = [ 
+    '_tutorial_0.csv',
+    '_tutorial_1.csv',
+    '_tutorial_2.csv',    
+    '_wall_level_1.csv',
+    '_tutorial_spike_1.csv',     
+    '_tutorial_spike_2.csv',
+    '_level_1.csv',
+    '_level_2.csv', 
+    'maze_level_1.csv',
+    'maze_level_2.csv', 
+    'tutorial_ghost_0.csv',  
+    'tutorial_ghost.csv',
+    'maze_level_3.csv',
+    'maze_level_4.csv',
+    'maze_level_omri1.csv',
+    'maze_level_omri2.csv',
+    'ghost_boss.csv',
+    'you_win.csv'
+]
