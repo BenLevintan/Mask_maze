@@ -15,11 +15,7 @@ WIDTH, HEIGHT = 800, 600
 
 # Level list - order matters
 LEVELS = [
-    'test_lvl.csv',
-    #'maze_level_1.csv',
-    'maze_level_2.csv',
-    'maze_level_3.csv',
-    #'maze_level_5.csv',
+    'maze_level_5.csv'
 ]
 
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
@@ -81,6 +77,8 @@ doors = level_data['doors']
 keys = level_data['keys']
 enemies = level_data['enemies']
 traps = level_data['traps']
+plate_presses = level_data['presses']
+boxes = level_data['boxes']
 if not player:
     print("Error: No player spawn point found in level!")
     pygame.quit()
@@ -147,6 +145,8 @@ def resolve_collision(player, solid_sprites):
     for solid in solid_sprites:
         if hasattr(solid, 'on_off') and not solid.on_off:
             continue
+        if hasattr(solid, 'is_open') and solid.is_open:
+            continue  # Skip open doors
         if check_aabb_collision(player.rect, solid.rect):
             # Undo X movement
             player.pos.x -= player.velocity.x
@@ -161,6 +161,8 @@ def resolve_collision(player, solid_sprites):
     for solid in solid_sprites:
         if hasattr(solid, 'on_off') and not solid.on_off:
             continue
+        if hasattr(solid, 'is_open') and solid.is_open:
+            continue  # Skip open doors
         if check_aabb_collision(player.rect, solid.rect):
             # Undo Y movement
             player.pos.y -= player.velocity.y
@@ -217,7 +219,7 @@ def check_spike_collision(player, traps):
 def next_level():
     """Load the next level."""
 
-    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps
+    global current_level_index, player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps, plate_presses, boxes
 
     current_level_index += 1
     level_data = load_level_by_index(current_level_index)
@@ -237,6 +239,8 @@ def next_level():
     traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
+    plate_presses=level_data['presses']
+    boxes = level_data['boxes']
     print(f"Level {current_level_index + 1} loaded!")
 
     return True
@@ -244,7 +248,7 @@ def next_level():
 
 def reload_level():
     """Reload the current level from scratch."""
-    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps
+    global player, all_sprites, solid_sprites, mask_sprites, endpoints, camera, doors, keys, enemies, traps, plate_presses, boxes
     
     level_data = load_level_by_index(current_level_index)
     
@@ -261,13 +265,23 @@ def reload_level():
     keys = level_data['keys']
     enemies = level_data['enemies']
     traps = level_data['traps']
+    plate_presses = level_data['presses']
+    boxes = level_data['boxes']
     camera = Camera(WIDTH, HEIGHT)
+    
+    # Link pressure plates to their corresponding doors
+    for press in plate_presses:
+        press.set_door_list([door for door in doors if door.door_id == press.plate_id])
     
     print(f"Level {current_level_index + 1} reloaded!")
     return True
 
 #[print(d.open_door()) for d in doors]
 #[print(d.door_id) for d in doors]
+
+# Link pressure plates to their corresponding doors (initial level)
+for press in plate_presses:
+    press.set_door_list([door for door in doors if door.door_id == press.plate_id])
 
 enemy_collisions=0
 
@@ -296,6 +310,56 @@ while running:
     if player:
         player.handle_input()
         
+        # Check for box pushing - player can push boxes if wearing matching color mask
+        # Use predicted position (current + velocity) to check collision
+        predicted_rect = player.rect.copy()
+        predicted_rect.x += player.velocity.x
+        predicted_rect.y += player.velocity.y
+        
+        for box in boxes:
+            if predicted_rect.colliderect(box.rect):
+                # Check if player has matching mask color
+                if player.current_mask == box.color:
+                    # Calculate push direction based on player velocity
+                    push_x = 0
+                    push_y = 0
+                    if player.velocity.x > 0:
+                        push_x = player.speed
+                    elif player.velocity.x < 0:
+                        push_x = -player.speed
+                    if player.velocity.y > 0:
+                        push_y = player.speed
+                    elif player.velocity.y < 0:
+                        push_y = -player.speed
+                    
+                    # Try to push box - check if new position would collide with walls
+                    new_box_rect = box.rect.copy()
+                    new_box_rect.x += push_x
+                    new_box_rect.y += push_y
+                    
+                    # Check collision with solid sprites (except the box itself)
+                    can_push = True
+                    for solid in solid_sprites:
+                        if solid != box and new_box_rect.colliderect(solid.rect):
+                            # Check if solid is actually solid (not a ghosted wall or open door)
+                            if hasattr(solid, 'on_off') and not solid.on_off:
+                                continue
+                            if hasattr(solid, 'is_open') and solid.is_open:
+                                continue
+                            can_push = False
+                            break
+                    
+                    # Also check collision with other boxes
+                    for other_box in boxes:
+                        if other_box != box and new_box_rect.colliderect(other_box.rect):
+                            can_push = False
+                            break
+                    
+                    if can_push:
+                        box.pos.x += push_x
+                        box.pos.y += push_y
+                        box.rect.topleft = (box.pos.x, box.pos.y)
+        
         # Move and check collision (handles both X and Y separately)
         resolve_collision(player, solid_sprites)
 
@@ -314,20 +378,17 @@ while running:
         for key in keys:
             key.update(dt)
 
-        #check press
+        # Update pressure plates
         for press in plate_presses:
             was_pressed = press.is_pressed
-            press.update(boxes,player, dt)
-            # If plate just got pressed, toggle doors and play sound
-            if press.is_pressed and not was_pressed:
+            press.update(boxes, player, dt)
+            # If plate state changed, toggle doors and play sound
+            if press.is_pressed != was_pressed:
                 press.change_doors()
                 sound_manager.play_sound('drag')
-            press.update(boxes,player,dt)
-
 
         # Update enemies and check if any are chasing
         any_enemy_chasing = False
-        # Update enemies
         for enemy in enemies:
             enemy.update(player)
             resolve_collision(enemy, solid_sprites)

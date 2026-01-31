@@ -260,25 +260,26 @@ class PressPlate(pygame.sprite.Sprite):
                 door.open_door()
     def set_door_list(self,doors):
         self.door_list=doors
-        print(doors)
-        print(self.plate_id)
-    def update(self,boxes,player, time_delta=0.016):
-        if not self.debouncing:
-            for box in boxes:
-                if box.pos[0]==self.pos[0] and box.pos[1]==self.pos[1]:
-                    self.change_doors()
-                    self.press()
-            else:
-                if player.pos[0] == self.pos[0] and player.pos[1] == self.pos[1]:
-                        self.counter+=1
-                        if self.counter>60:
-                            if not self.is_pressed:
-                                self.change_doors()
-                                self.press()
-                            else:
-                                self.change_doors()
-                                self.depress()
-                            self.counter=0
+    
+    def update(self, boxes, player, time_delta=0.016):
+        """Check if box or player is on the plate using collision detection."""
+        currently_pressed = False
+        
+        # Check if any box is colliding with the plate
+        for box in boxes:
+            if self.rect.colliderect(box.rect):
+                currently_pressed = True
+                break
+        
+        # Check if player is colliding with the plate
+        if not currently_pressed and self.rect.colliderect(player.rect):
+            currently_pressed = True
+        
+        # Update pressed state
+        if currently_pressed and not self.is_pressed:
+            self.press()
+        elif not currently_pressed and self.is_pressed:
+            self.depress()
 
 
 
