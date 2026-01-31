@@ -13,7 +13,7 @@ WIDTH, HEIGHT = 1600, 960
 
 # Level list - order matters
 LEVELS = [
-    #'test_lvl.csv',
+    'test_lvl.csv',
     #'maze_level_1.csv',
     'maze_level_3.csv',
     #'maze_level_5.csv',
