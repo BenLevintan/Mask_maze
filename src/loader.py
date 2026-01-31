@@ -95,7 +95,10 @@ def create_asset_dict(tile_size):
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['pr'] = load_texture('press.bmp', tile_size, tile_size, colors['white'])
-
+    assets['dk1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dk2'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dk3'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])  # ADD THIS
+    assets['dp1'] = load_texture('door.bmp', tile_size, tile_size, colors['green'])   # ADD THIS
 
 
     # Traps
@@ -297,11 +300,11 @@ def load_level(csv_path, tile_size=32):
                     
                     # Pressure plate 1 not debounce
                     elif cell in ['p1','p2','p3']:
-                        plate = PressPlate(x, y, assets['pr'], cell[1])
+                        plate = PressPlate(x, y, assets['pr'], int(cell[1]))
                         all_sprites.add(plate)
                         plates.add(plate)
                     elif cell in ['p1d', 'p2d', 'p3d']:
-                        plate = PressPlate(x, y, assets['pr'], cell[1],debounce=True)
+                        plate = PressPlate(x, y, assets['pr'], int(cell[1]),debounce=True)
                         all_sprites.add(plate)
                         plates.add(plate)
                     
