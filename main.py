@@ -53,8 +53,6 @@ doors = level_data['doors']
 keys = level_data['keys']
 enemies = level_data['enemies']
 traps = level_data['traps']
-plate_presses=level_data['presses']
-boxes = level_data['boxes']
 if not player:
     print("Error: No player spawn point found in level!")
     pygame.quit()
@@ -209,8 +207,6 @@ def next_level():
     traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
-    plate_presses=level_data['plate_presses']
-    boxes = level_data['boxes']
     print(f"Level {current_level_index + 1} loaded!")
 
     return True
@@ -225,7 +221,7 @@ def reload_level():
     if not level_data:
         print("Error: Could not reload level!")
         return False
-    enemies=level_data['enemies']
+    
     player = level_data['player']
     all_sprites = level_data['all_sprites']
     solid_sprites = level_data['solid_sprites']
@@ -233,9 +229,8 @@ def reload_level():
     endpoints = level_data['endpoints']
     doors = level_data['doors']
     keys = level_data['keys']
+    enemies = level_data['enemies']
     traps = level_data['traps']
-    plate_presses = level_data['plate_presses']
-    boxes = level_data['boxes']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} reloaded!")
@@ -243,10 +238,8 @@ def reload_level():
 
 #[print(d.open_door()) for d in doors]
 #[print(d.door_id) for d in doors]
-#[print(d.door_id) for d in plate_presses]
+
 enemy_collisions=0
-for press in plate_presses:
-   press.set_door_list([door for door in doors if door.door_id == press.plate_id])
 
 # Game loop
 while running:
@@ -290,11 +283,6 @@ while running:
         # Animate keys with bobbing motion
         for key in keys:
             key.update(dt)
-
-        #check press
-        for press in plate_presses:
-            press.update(boxes,player,dt)
-
 
         # Update enemies
         for enemy in enemies:
