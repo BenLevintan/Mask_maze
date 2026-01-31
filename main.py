@@ -53,7 +53,8 @@ doors = level_data['doors']
 keys = level_data['keys']
 enemies = level_data['enemies']
 traps = level_data['traps']
-
+plate_presses=level_data['presses']
+boxes = level_data['boxes']
 if not player:
     print("Error: No player spawn point found in level!")
     pygame.quit()
@@ -208,7 +209,10 @@ def next_level():
     traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
+    plate_presses=level_data['plate_presses']
+    boxes = level_data['boxes']
     print(f"Level {current_level_index + 1} loaded!")
+
     return True
 
 
@@ -230,6 +234,8 @@ def reload_level():
     doors = level_data['doors']
     keys = level_data['keys']
     traps = level_data['traps']
+    plate_presses = level_data['plate_presses']
+    boxes = level_data['boxes']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} reloaded!")
@@ -279,6 +285,9 @@ while running:
         for key in keys:
             key.update(dt)
 
+        #check press
+        for press in plate_presses:
+            press.update(boxes,dt)
 
 
         # Update enemies
@@ -287,7 +296,6 @@ while running:
             resolve_collision(enemy, solid_sprites)
             if check_aabb_collision(player.rect,enemy.rect):
                 enemy_collisions+=1
-                #pygame.time.delay(2)
                 if enemy_collisions>50:
                     enemy_collisions=0
                     reload_level()
