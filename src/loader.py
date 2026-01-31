@@ -1,7 +1,7 @@
 import pygame
 import os
 
-from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint,PressPlate,Key,ArrowTrap,Spike,GuillotineTrap,Decoration
+from .entities import Wall, Player,Enemy,Door,Mask,Box,Endpoint,PressPlate, Spike, Key
 
 import random
 
@@ -88,6 +88,9 @@ def create_asset_dict(tile_size):
     assets['d1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['d2'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['d3'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d1o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d2o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d3o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['k1'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
@@ -265,12 +268,12 @@ def load_level(csv_path, tile_size=32):
                         boxes.add(box)
                         mask_sprites.add(box)
                     
-                    # Door 1
-                    elif cell == 'dk1':
-                        door = Door(x, y, assets['dk1'], 1)
-                        all_sprites.add(door)
-                        solid_sprites.add(door)
-                        doors.add(door)
+                    # # Door 1
+                    # elif cell == 'd1':
+                    #     door = Door(x, y, assets['d1'], 1)
+                    #     all_sprites.add(door)
+                    #     solid_sprites.add(door)
+                    #     doors.add(door)
                     
                     # Key 1, 2, 3
                     elif cell in ['k1', 'k2', 'k3']:
@@ -280,8 +283,17 @@ def load_level(csv_path, tile_size=32):
                         keys.add(key)
                     
                     # Door
-                    elif cell in ['d1','d2','d3']:
-                        door = Door(x, y, assets[cell], int(cell[1]))
+                    elif cell in ['d1', 'd2', 'd3']:
+                        door_id = int(cell[1])
+                        door = Door(x, y, assets[cell], door_id)
+                        all_sprites.add(door)
+                        solid_sprites.add(door)
+                        doors.add(door)
+                        print("Added closed door")
+                    elif cell in ['d1o', 'd2o', 'd3o']:
+                        door_id = int(cell[1])
+                        door = Door(x, y, assets[cell], door_id)
+                        door.open_door()
                         all_sprites.add(door)
                         solid_sprites.add(door)
                         doors.add(door)
@@ -296,31 +308,13 @@ def load_level(csv_path, tile_size=32):
                         all_sprites.add(plate)
                         plates.add(plate)
                     
-                    # Arrow traps
-                    elif cell in ['tau', 'tad', 'tar', 'tal']:
-                        direction_map = {'tau': 'up', 'tad': 'down', 'tar': 'right', 'tal': 'left'}
-                        trap = ArrowTrap(x, y, assets[cell], direction_map[cell])
-                        all_sprites.add(trap)
-                        traps.add(trap)
                     
                     # Spike traps (guillotine right with alternating animation)
                     elif cell == 'tgr':
                         spike = Spike(x, y, assets['tgr_closed'], assets['tgr_open'])
                         all_sprites.add(spike)
                         traps.add(spike)
-                    
-                    # Guillotine traps
-                    elif cell in ['tgu', 'tgd', 'tgl']:
-                        direction_map = {'tgu': 'up', 'tgd': 'down', 'tgl': 'left'}
-                        trap = GuillotineTrap(x, y, assets[cell], direction_map[cell])
-                        all_sprites.add(trap)
-                        traps.add(trap)
-                    
-                    # Decoration
-                    elif cell == 'dec':
-                        deco = Decoration(x, y, assets['dec'])
-                        all_sprites.add(deco)
-                    
+
                     # Endpoint
                     elif cell == 'end':
                         endpoint = Endpoint(x, y, assets['end'])

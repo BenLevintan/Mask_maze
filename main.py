@@ -15,10 +15,11 @@ WIDTH, HEIGHT = 800, 600
 
 # Level list - order matters
 LEVELS = [
-    #'test_lvl.csv',
+    'test_lvl.csv',
     #'maze_level_1.csv',
     'maze_level_2.csv',
     'maze_level_3.csv',
+    #'maze_level_5.csv',
 ]
 
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
@@ -80,8 +81,6 @@ doors = level_data['doors']
 keys = level_data['keys']
 enemies = level_data['enemies']
 traps = level_data['traps']
-plate_presses=level_data['presses']
-boxes = level_data['boxes']
 if not player:
     print("Error: No player spawn point found in level!")
     pygame.quit()
@@ -238,8 +237,6 @@ def next_level():
     traps = level_data['traps']
     camera = Camera(WIDTH, HEIGHT)
     enemies = level_data['enemies']
-    plate_presses=level_data['presses']
-    boxes = level_data['boxes']
     print(f"Level {current_level_index + 1} loaded!")
 
     return True
@@ -254,7 +251,7 @@ def reload_level():
     if not level_data:
         print("Error: Could not reload level!")
         return False
-    enemies=level_data['enemies']
+    
     player = level_data['player']
     all_sprites = level_data['all_sprites']
     solid_sprites = level_data['solid_sprites']
@@ -262,9 +259,8 @@ def reload_level():
     endpoints = level_data['endpoints']
     doors = level_data['doors']
     keys = level_data['keys']
+    enemies = level_data['enemies']
     traps = level_data['traps']
-    plate_presses = level_data['presses']
-    boxes = level_data['boxes']
     camera = Camera(WIDTH, HEIGHT)
     
     print(f"Level {current_level_index + 1} reloaded!")
@@ -272,10 +268,8 @@ def reload_level():
 
 #[print(d.open_door()) for d in doors]
 #[print(d.door_id) for d in doors]
-#[print(d.door_id) for d in plate_presses]
+
 enemy_collisions=0
-for press in plate_presses:
-   press.set_door_list([door for door in doors if door.door_id == press.plate_id])
 
 # Game loop
 while running:
@@ -333,6 +327,7 @@ while running:
 
         # Update enemies and check if any are chasing
         any_enemy_chasing = False
+        # Update enemies
         for enemy in enemies:
             enemy.update(player)
             resolve_collision(enemy, solid_sprites)
