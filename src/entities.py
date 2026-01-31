@@ -106,9 +106,10 @@ class Enemy(Character):
         self.facing_right = True  # Track sprite direction
         self.base_image = sprite_img.copy()  # Store original sprite
         self.sprite_variants = sprite_variants or {}  # Dict of mask color -> sprite image
+        self.chase_distance=250
     def set_speed(self,player):
         #self.velocity=(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[0] - player.pos[0]) ,(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[1] - player.pos[1])
-        if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<150:
+        if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<self.chase_distance:
             speed_factor=5
         else:
             speed_factor=1

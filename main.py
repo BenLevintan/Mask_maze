@@ -30,7 +30,7 @@ sound_manager = SoundManager(assets_path)
 
 # Load sound effects
 sound_manager.load_sound('key', 'sound effects/key/key1.wav')
-sound_manager.load_sound('trap', 'sound effects/trap/trap1.wav')
+sound_manager.load_sound('trap', 'sound effects/trap/trap1.wav', volume=0.3)
 sound_manager.load_sound('button', 'sound effects/button/button1.wav')
 
 # Load drag sound variants (for door opening)
@@ -43,6 +43,9 @@ sound_manager.load_sound_variants('hurt', hurt_sounds)
 
 # Start background music
 sound_manager.play_music('music/MainMusic.wav')
+
+# Load chase music
+sound_manager.load_chase_music('music/ChaseMusic.wav')
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Masks - Game Jam")
@@ -328,16 +331,29 @@ while running:
             press.update(boxes,player,dt)
 
 
-        # Update enemies
+        # Update enemies and check if any are chasing
+        any_enemy_chasing = False
         for enemy in enemies:
             enemy.update(player)
             resolve_collision(enemy, solid_sprites)
+            
+            # Check if this enemy is within chase distance
+            distance = ((player.pos[0] - enemy.pos[0])**2 + (player.pos[1] - enemy.pos[1])**2)**0.5
+            if distance < enemy.chase_distance:
+                any_enemy_chasing = True
+            
             if check_aabb_collision(player.rect,enemy.rect):
                 enemy_collisions+=1
                 if enemy_collisions>50:
                     enemy_collisions=0
                     sound_manager.play_sound('hurt')
                     reload_level()
+        
+        # Switch music based on chase state
+        if any_enemy_chasing:
+            sound_manager.start_chase()
+        else:
+            sound_manager.stop_chase()
         # Animate spikes
         for trap in traps:
             if trap.__class__.__name__ == 'Spike':
