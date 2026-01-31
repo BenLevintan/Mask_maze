@@ -241,7 +241,13 @@ def reload_level():
     print(f"Level {current_level_index + 1} reloaded!")
     return True
 
+#[print(d.open_door()) for d in doors]
+#[print(d.door_id) for d in doors]
+#[print(d.door_id) for d in plate_presses]
 enemy_collisions=0
+for press in plate_presses:
+   press.set_door_list([door for door in doors if door.door_id == press.plate_id])
+
 # Game loop
 while running:
     dt = clock.tick(60) / 1000.0  # Delta time in seconds
@@ -287,7 +293,7 @@ while running:
 
         #check press
         for press in plate_presses:
-            press.update(boxes,dt)
+            press.update(boxes,player,dt)
 
 
         # Update enemies
