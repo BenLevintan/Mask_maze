@@ -381,8 +381,16 @@ while running:
     # Render
     screen.fill((20, 20, 30))
     
-    # Draw sprites with camera offset - sort by Y position for proper depth
-    sorted_sprites = sorted(all_sprites, key=lambda sprite: sprite.rect.y)
+    # Draw sprites with camera offset - sort by layer then Y position
+    def get_sprite_layer(sprite):
+        class_name = sprite.__class__.__name__
+        if class_name in ('Spike', 'ArrowTrap', 'GuillotineTrap', 'PressPlate'):
+            return 0  # Traps and plates draw first (bottom)
+        elif class_name == 'Player':
+            return 2  # Player draws on top
+        return 1  # Everything else in the middle
+    
+    sorted_sprites = sorted(all_sprites, key=lambda s: (get_sprite_layer(s), s.rect.y))
     for sprite in sorted_sprites:
         screen.blit(sprite.image, camera.apply(sprite))
     
