@@ -1,7 +1,7 @@
 from doctest import debug
 
 import pygame
-from pygame.examples.go_over_there import clock
+
 
 
 class Wall(pygame.sprite.Sprite):
@@ -262,6 +262,8 @@ class PressPlate(pygame.sprite.Sprite):
                 door.open_door()
     def set_door_list(self,doors):
         self.door_list=doors
+        print(doors)
+        print(self.plate_id)
     def update(self,boxes,player, time_delta=0.016):
         if not self.debouncing:
             for box in boxes:

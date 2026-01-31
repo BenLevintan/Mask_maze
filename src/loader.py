@@ -88,6 +88,9 @@ def create_asset_dict(tile_size):
     assets['d1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['d2'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['d3'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d1o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d2o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
+    assets['d3o'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
     assets['k1'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k2'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
     assets['k3'] = load_texture('image.bmp', tile_size, tile_size, colors['yellow'])
@@ -279,6 +282,12 @@ def load_level(csv_path, tile_size=32):
                     # Door
                     elif cell in ['d1',',d2','d3']:
                         door = Door(x, y, assets[cell], cell[1])
+                        all_sprites.add(door)
+                        solid_sprites.add(door)
+                        doors.add(door)
+                    elif cell in ['d1o', ',d2o', 'd3o']:
+                        door = Door(x, y, assets[cell], cell[1])
+                        door.open_door()
                         all_sprites.add(door)
                         solid_sprites.add(door)
                         doors.add(door)

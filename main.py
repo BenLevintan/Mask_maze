@@ -15,8 +15,8 @@ WIDTH, HEIGHT = 1600, 960
 LEVELS = [
     #'test_lvl.csv',
     #'maze_level_1.csv',
-    #'maze_level_2.csv',
     'maze_level_3.csv',
+    #'maze_level_5.csv',
 ]
 
 pygame.init()
