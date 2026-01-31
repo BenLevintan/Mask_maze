@@ -1,4 +1,8 @@
+from doctest import debug
+
 import pygame
+from pygame.examples.go_over_there import clock
+
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, image, tile_size, color=(100, 100, 100)):
@@ -237,12 +241,15 @@ class PressPlate(pygame.sprite.Sprite):
     is_pressed = False
     debouncing = False
     door_list = []
-    def __init__(self, x, y, sprite_img, plate_id):
+    def __init__(self, x, y, sprite_img, plate_id,debounce=False):
         super().__init__()
+        self.pos=[x,y]
         self.image = sprite_img
         self.rect = self.image.get_rect(topleft=(x, y))
         self.plate_id = plate_id
         self.is_pressed = False
+        self.debouncing = debounce
+        self.counter=0
     def press(self):
         self.is_pressed=True
     def depress(self):
@@ -253,6 +260,28 @@ class PressPlate(pygame.sprite.Sprite):
                 door.close_door()
             else:
                 door.open_door()
+    def set_door_list(self,doors):
+        self.door_list=doors
+    def update(self,boxes,player, time_delta=0.016):
+        if not self.debouncing:
+            for box in boxes:
+                if box.pos[0]==self.pos[0] and box.pos[1]==self.pos[1]:
+                    self.change_doors()
+                    self.press()
+            else:
+                if player.pos[0] == self.pos[0] and player.pos[1] == self.pos[1]:
+                        self.counter+=1
+                        if self.counter>60:
+                            if not self.is_pressed:
+                                self.change_doors()
+                                self.press()
+                            else:
+                                self.change_doors()
+                                self.depress()
+                            self.counter=0
+
+
+
 
 
 
