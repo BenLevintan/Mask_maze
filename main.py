@@ -11,7 +11,7 @@ from src.loader import load_level
 from src.entities import Player, Wall
 
 TILE_SIZE = 32
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1800, 960
 
 # Level list - order matters
 LEVELS = [
@@ -27,6 +27,7 @@ LEVELS = [
     '_tutorial_ghost.csv',
     'maze_level_2.csv', 
     'maze_level_3.csv',
+    'tutorial_box.csv',
     'maze_level_4.csv',
     'maze_level_omri1.csv',
     'maze_level_omri2.csv',
@@ -95,6 +96,7 @@ enemies = level_data['enemies']
 traps = level_data['traps']
 plate_presses = level_data['presses']
 boxes = level_data['boxes']
+
 if not player:
     print("Error: No player spawn point found in level!")
     pygame.quit()
