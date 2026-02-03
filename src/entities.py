@@ -70,17 +70,17 @@ class Player(Character):
                 self._update_sprite_display()
 
     def _update_sprite_display(self):
-        """Update the displayed sprite based on current mask and facing direction."""
-        # Get the current sprite (base or masked variant)
         current_sprite = self.base_image
+
         if self.current_mask and self.current_mask in self.sprite_variants:
             current_sprite = self.sprite_variants[self.current_mask]
-        
-        # Apply facing direction
+
+        sprite = current_sprite.copy()
+
         if not self.facing_right:
-            self.image = pygame.transform.flip(current_sprite, True, False)
-        else:
-            self.image = current_sprite.copy()
+            sprite = pygame.transform.flip(sprite, True, False)
+
+        self.image = sprite
 
     def update(self):
         """Update player position."""
@@ -123,6 +123,7 @@ class Enemy(Character):
             self.velocity[1]=-speed_factor
         if player.pos[1] - self.pos[1] > 0:
             self.velocity[1] = speed_factor
+
     def _update_sprite_display(self):
         """Update the displayed sprite based on current mask and facing direction."""
         # Get the current sprite (base or masked variant)
