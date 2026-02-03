@@ -82,7 +82,7 @@ def create_asset_dict(tile_size):
     assets['mb'] = load_texture('blue_wolf_mask_32.bmp', tile_size, tile_size, colors['blue'])
     
     # Boxes
-    assets['br'] = load_texture('red_box.bmp', tile_size, tile_size, (180, 50, 50))
+    assets['br'] = load_texture('red_box.bmp', tile_size -4, tile_size - 4, (180, 50, 50))
     
     # Doors and keys
     assets['d1'] = load_texture('door.bmp', tile_size, tile_size, colors['purple'])
