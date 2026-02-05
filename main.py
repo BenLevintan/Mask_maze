@@ -458,7 +458,7 @@ while running:
     # Draw sprites with camera offset - sort by layer then Y position
     def get_sprite_layer(sprite):
         class_name = sprite.__class__.__name__
-        if class_name in ('Spike', 'ArrowTrap', 'GuillotineTrap', 'PressPlate'):
+        if class_name in ('Spike', 'PressPlate'):
             return 0  # Traps and plates draw first (bottom)
         elif class_name == 'Player':
             return 2  # Player draws on top
