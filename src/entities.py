@@ -1,7 +1,4 @@
-from doctest import debug
-
 import pygame
-
 
 
 class Wall(pygame.sprite.Sprite):
@@ -73,17 +70,17 @@ class Player(Character):
                 self._update_sprite_display()
 
     def _update_sprite_display(self):
-        """Update the displayed sprite based on current mask and facing direction."""
-        # Get the current sprite (base or masked variant)
         current_sprite = self.base_image
+
         if self.current_mask and self.current_mask in self.sprite_variants:
             current_sprite = self.sprite_variants[self.current_mask]
-        
-        # Apply facing direction
+
+        sprite = current_sprite.copy()
+
         if not self.facing_right:
-            self.image = pygame.transform.flip(current_sprite, True, False)
-        else:
-            self.image = current_sprite.copy()
+            sprite = pygame.transform.flip(sprite, True, False)
+
+        self.image = sprite
 
     def update(self):
         """Update player position."""
@@ -109,9 +106,10 @@ class Enemy(Character):
         self.facing_right = True  # Track sprite direction
         self.base_image = sprite_img.copy()  # Store original sprite
         self.sprite_variants = sprite_variants or {}  # Dict of mask color -> sprite image
+        self.chase_distance=250
     def set_speed(self,player):
         #self.velocity=(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[0] - player.pos[0]) ,(((self.pos[0] - player.pos[0])**2+(self.pos[1] - player.pos[1])**2)*0.5)*(self.pos[1] - player.pos[1])
-        if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<150:
+        if ((player.pos[0]-self.pos[0])**2 + (player.pos[1]-self.pos[1])**2)**0.5<self.chase_distance:
             speed_factor=5
         else:
             speed_factor=1
@@ -125,6 +123,7 @@ class Enemy(Character):
             self.velocity[1]=-speed_factor
         if player.pos[1] - self.pos[1] > 0:
             self.velocity[1] = speed_factor
+
     def _update_sprite_display(self):
         """Update the displayed sprite based on current mask and facing direction."""
         # Get the current sprite (base or masked variant)
@@ -262,25 +261,26 @@ class PressPlate(pygame.sprite.Sprite):
                 door.open_door()
     def set_door_list(self,doors):
         self.door_list=doors
-        print(doors)
-        print(self.plate_id)
-    def update(self,boxes,player, time_delta=0.016):
-        if not self.debouncing:
-            for box in boxes:
-                if box.pos[0]==self.pos[0] and box.pos[1]==self.pos[1]:
-                    self.change_doors()
-                    self.press()
-            else:
-                if player.pos[0] == self.pos[0] and player.pos[1] == self.pos[1]:
-                        self.counter+=1
-                        if self.counter>60:
-                            if not self.is_pressed:
-                                self.change_doors()
-                                self.press()
-                            else:
-                                self.change_doors()
-                                self.depress()
-                            self.counter=0
+    
+    def update(self, boxes, player, time_delta=0.016):
+        """Check if box or player is on the plate using collision detection."""
+        currently_pressed = False
+        
+        # Check if any box is colliding with the plate
+        for box in boxes:
+            if self.rect.colliderect(box.rect):
+                currently_pressed = True
+                break
+        
+        # Check if player is colliding with the plate
+        if not currently_pressed and self.rect.colliderect(player.rect):
+            currently_pressed = True
+        
+        # Update pressed state
+        if currently_pressed and not self.is_pressed:
+            self.press()
+        elif not currently_pressed and self.is_pressed:
+            self.depress()
 
 
 
