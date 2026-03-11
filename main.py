@@ -13,6 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from src.audio import SoundManager
 from src.loader import load_level
 
+os.environ['SDL_VIDEO_CENTERED'] = '1'
+
 TILE_SIZE = 32
 WIDTH, HEIGHT = 1800, 960
 
@@ -42,7 +44,7 @@ pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512)
 pygame.init()
 
 # OpenGL Configuration - Use DOUBLEBUF and OPENGL flags
-screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE)
 pygame.display.set_caption("Masks - Game Jam")
 
 # We draw the game to this off-screen surface, then pass it to the shader
@@ -281,32 +283,30 @@ varying vec2 v_texcoord;
 uniform sampler2D texture;
 
 void main() {
-    // 1. Screen Curvature (Barrel Distortion)
+    // 1. Curvature: Reduced from 0.15 to 0.04 for a very subtle screen bulge
     vec2 crt_coords = v_texcoord - 0.5;
     float rsq = crt_coords.x * crt_coords.x + crt_coords.y * crt_coords.y;
-    crt_coords += crt_coords * (rsq * 0.15); // Adjust 0.15 for more/less curve
+    crt_coords += crt_coords * (rsq * 0.04); 
     crt_coords += 0.5;
 
-    // Cut off the edges that get warped outside the screen bounds
     if (crt_coords.x < 0.0 || crt_coords.x > 1.0 || crt_coords.y < 0.0 || crt_coords.y > 1.0) {
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
-    // 2. Chromatic Aberration (Color bleeding on edges)
-    float r = texture2D(texture, crt_coords + vec2(0.002, 0.0)).r;
+    // 2. Chromatic Aberration: Reduced offset from 0.002 to 0.0008 (less blurry edges)
+    float r = texture2D(texture, crt_coords + vec2(0.0008, 0.0)).r;
     float g = texture2D(texture, crt_coords).g;
-    float b = texture2D(texture, crt_coords - vec2(0.002, 0.0)).b;
+    float b = texture2D(texture, crt_coords - vec2(0.0008, 0.0)).b;
     vec4 color = vec4(r, g, b, 1.0);
 
-    // 3. Scanlines
-    // Multiply by a high number to create horizontal lines across the Y axis
-    float scanline = sin(crt_coords.y * 800.0) * 0.04;
+    // 3. Scanlines: Reduced opacity from 0.04 to 0.015
+    float scanline = sin(crt_coords.y * 800.0) * 0.015;
     color.rgb -= scanline;
 
-    // 4. Vignette (Darkened corners)
+    // 4. Vignette: Pushed further out into the corners and softened
     float vignette = distance(v_texcoord, vec2(0.5));
-    color.rgb *= smoothstep(0.8, 0.2, vignette * vignette * 2.0);
+    color.rgb *= smoothstep(1.0, 0.3, vignette * vignette * 1.5);
 
     gl_FragColor = color;
 }
