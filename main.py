@@ -352,19 +352,23 @@ async def main():
         dt = clock.tick(60) / 1000.0 
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    player.equip_mask('red')
-                elif event.key == pygame.K_2:
-                    player.equip_mask('green')
-                elif event.key == pygame.K_3:
-                    player.equip_mask('blue')
-                elif event.key == pygame.K_0:
-                    player.unequip_mask()
-                elif event.key == pygame.K_r:
-                    reload_level()
+                    if event.type == pygame.QUIT:
+                        running = False
+                    elif event.type == pygame.KEYDOWN:
+                        # Add these two lines right here
+                        if event.key == pygame.K_ESCAPE:
+                            running = False
+                        # The rest stays the same
+                        elif event.key == pygame.K_1:
+                            player.equip_mask('red')
+                        elif event.key == pygame.K_2:
+                            player.equip_mask('green')
+                        elif event.key == pygame.K_3:
+                            player.equip_mask('blue')
+                        elif event.key == pygame.K_0:
+                            player.unequip_mask()
+                        elif event.key == pygame.K_r:
+                            reload_level()
         
         if player:
             player.handle_input()
@@ -478,7 +482,7 @@ async def main():
         lives_text = font.render(f"Lives: {player.lives}", True, (255, 255, 255))
         mask_text = font.render(f"Mask: {player.current_mask or 'None'}", True, (255, 255, 255))
         level_text = font.render(f"Level: {current_level_index + 1}/{len(LEVELS)}", True, (255, 255, 255))
-        help_text = font.render("1=Red, 2=Green, 3=Blue, 0=No Mask | R=Reset | Arrow Keys=Move", True, (150, 150, 150))
+        help_text = font.render("R=Reset | ESC=Exit | Arrow Keys=Move", True, (150, 150, 150))
         
         game_surface.blit(help_text, (10, HEIGHT - 110))
         game_surface.blit(level_text, (10, HEIGHT - 80))
