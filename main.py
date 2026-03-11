@@ -286,7 +286,7 @@ void main() {
     // 1. Curvature: Reduced from 0.15 to 0.04 for a very subtle screen bulge
     vec2 crt_coords = v_texcoord - 0.5;
     float rsq = crt_coords.x * crt_coords.x + crt_coords.y * crt_coords.y;
-    crt_coords += crt_coords * (rsq * 0.04); 
+    crt_coords += crt_coords * (rsq * 0.08); 
     crt_coords += 0.5;
 
     if (crt_coords.x < 0.0 || crt_coords.x > 1.0 || crt_coords.y < 0.0 || crt_coords.y > 1.0) {
@@ -300,8 +300,8 @@ void main() {
     float b = texture2D(texture, crt_coords - vec2(0.0008, 0.0)).b;
     vec4 color = vec4(r, g, b, 1.0);
 
-    // 3. Scanlines: Reduced opacity from 0.04 to 0.015
-    float scanline = sin(crt_coords.y * 800.0) * 0.015;
+    // 3. Scanlines: Reduced opacity from 0.04 to 0.02
+    float scanline = sin(crt_coords.y * 800.0) * 0.02;
     color.rgb -= scanline;
 
     // 4. Vignette: Pushed further out into the corners and softened
