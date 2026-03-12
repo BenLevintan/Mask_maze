@@ -271,7 +271,6 @@ varying vec2 v_texcoord;
 
 void main() {
     gl_Position = vec4(position, 0.0, 1.0);
-    // Removed the manual flip here since pygame.image.tostring handles it
     v_texcoord = texcoord; 
 }
 """
@@ -283,28 +282,25 @@ varying vec2 v_texcoord;
 uniform sampler2D texture;
 
 void main() {
-    // 1. Curvature: Reduced from 0.15 to 0.04 for a very subtle screen bulge
     vec2 crt_coords = v_texcoord - 0.5;
     float rsq = crt_coords.x * crt_coords.x + crt_coords.y * crt_coords.y;
     crt_coords += crt_coords * (rsq * 0.08); 
     crt_coords += 0.5;
 
+    // Use a small epsilon for bounds checking to avoid artifacts
     if (crt_coords.x < 0.0 || crt_coords.x > 1.0 || crt_coords.y < 0.0 || crt_coords.y > 1.0) {
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
-    // 2. Chromatic Aberration: Reduced offset from 0.002 to 0.0008 (less blurry edges)
     float r = texture2D(texture, crt_coords + vec2(0.0008, 0.0)).r;
     float g = texture2D(texture, crt_coords).g;
     float b = texture2D(texture, crt_coords - vec2(0.0008, 0.0)).b;
     vec4 color = vec4(r, g, b, 1.0);
 
-    // 3. Scanlines: Reduced opacity from 0.04 to 0.02
     float scanline = sin(crt_coords.y * 800.0) * 0.02;
     color.rgb -= scanline;
 
-    // 4. Vignette: Pushed further out into the corners and softened
     float vignette = distance(v_texcoord, vec2(0.5));
     color.rgb *= smoothstep(1.0, 0.3, vignette * vignette * 1.5);
 
